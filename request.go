@@ -62,6 +62,11 @@ func (r *Response) RawText() string {
 	return strings.TrimSpace(string(r.body))
 }
 
+// RawBytes returns the body of the server's response as byte slice
+func (r *Response) RawBytes() []byte {
+	return r.body
+}
+
 // Status returns the HTTP status for the executed request, or 0 if request has
 // not yet been sent.
 func (r *Response) Status() int {

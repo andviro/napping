@@ -6,6 +6,7 @@
 package napping
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"github.com/bmizerany/assert"
@@ -15,7 +16,6 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"bytes"
 )
 
 func init() {
@@ -219,6 +219,7 @@ func TestPut(t *testing.T) {
 	assert.Equal(t, resp.Status(), 200)
 	// Server should return NO data
 	assert.Equal(t, resp.RawText(), "")
+	assert.Equal(t, len(resp.RawBytes()), 0)
 }
 
 func TestPatch(t *testing.T) {
@@ -233,6 +234,7 @@ func TestPatch(t *testing.T) {
 	assert.Equal(t, resp.Status(), 200)
 	// Server should return NO data
 	assert.Equal(t, resp.RawText(), "")
+	assert.Equal(t, len(resp.RawBytes()), 0)
 }
 
 func TestRawRequestWithData(t *testing.T) {
@@ -240,13 +242,13 @@ func TestRawRequestWithData(t *testing.T) {
 	defer srv.Close()
 
 	var payload = bytes.NewBufferString("napping")
-	res := structType {}
-	req := Request {
-		Url: "http://" + srv.Listener.Addr().String(),
-		Method: "PUT",
+	res := structType{}
+	req := Request{
+		Url:        "http://" + srv.Listener.Addr().String(),
+		Method:     "PUT",
 		RawPayload: true,
-		Payload: payload,
-		Result: &res,
+		Payload:    payload,
+		Result:     &res,
 	}
 
 	resp, err := Send(&req)
@@ -263,13 +265,13 @@ func TestRawRequestWithoutData(t *testing.T) {
 	defer srv.Close()
 
 	var payload *bytes.Buffer = nil
-	res := structType {}
-	req := Request {
-		Url: "http://" + srv.Listener.Addr().String(),
-		Method: "PUT",
+	res := structType{}
+	req := Request{
+		Url:        "http://" + srv.Listener.Addr().String(),
+		Method:     "PUT",
 		RawPayload: true,
-		Payload: payload,
-		Result: &res,
+		Payload:    payload,
+		Result:     &res,
 	}
 
 	resp, err := Send(&req)
@@ -285,14 +287,14 @@ func TestRawRequestInvalidType(t *testing.T) {
 	srv := httptest.NewServer(http.HandlerFunc(HandleRaw))
 	defer srv.Close()
 
-	payload := structType {}
-	res := structType {}
-	req := Request {
-		Url: "http://" + srv.Listener.Addr().String(),
-		Method: "PUT",
+	payload := structType{}
+	res := structType{}
+	req := Request{
+		Url:        "http://" + srv.Listener.Addr().String(),
+		Method:     "PUT",
 		RawPayload: true,
-		Payload: payload,
-		Result: &res,
+		Payload:    payload,
+		Result:     &res,
 	}
 
 	_, err := Send(&req)
@@ -485,7 +487,7 @@ func HandlePatch(w http.ResponseWriter, req *http.Request) {
 
 func HandleRaw(w http.ResponseWriter, req *http.Request) {
 	var err error
-	var result = structType {}
+	var result = structType{}
 	if req.ContentLength <= 0 {
 		result.Bar = "empty"
 	} else {
@@ -494,7 +496,7 @@ func HandleRaw(w http.ResponseWriter, req *http.Request) {
 		if err == nil {
 			result.Bar = string(body)
 		}
- 	}
+	}
 
 	if err != nil {
 		JsonError(w, err.Error(), http.StatusInternalServerError)
